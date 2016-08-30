@@ -1,12 +1,13 @@
 ###Blood Donation Dataset Classification Problem###
 
 #Importing dataset and libraries
-blooddata <- read.csv("C:/Users/Martin/Desktop/DrivenData/test.csv")
+blooddata <- read.csv("~/Desktop/Blood Data Compitition/train.csv")
+testset <- read.csv("~/Desktop/Blood Data Compitition/testset.csv")
 View(blooddata)
 attach(blooddata)
-library("aod", lib.loc="~/R/win-library/3.2")
-library("ggplot2", lib.loc="~/R/win-library/3.2")
-library("ggplot2", lib.loc="~/R/win-library/3.2")
+library("Metrics", lib.loc="/Library/Frameworks/R.framework/Versions/3.3/Resources/library")
+library("ggplot2", lib.loc="/Library/Frameworks/R.framework/Versions/3.3/Resources/library")
+
 
 
 
@@ -55,12 +56,24 @@ initialmodel <- glm(Made.Donation.in.March.2007 ~ Number.of.Donations + Months.s
 #Factors seem to be significant, based on the confidence intervals and p-values
 summary(initialmodel)
 confint(initialmodel)
-plot(initialmodel)
+#plot(initialmodel)
 
 
 #Getting Predicted Probabilities
-blooddata$predictions <- predict(initialmodel, data=blooddata, type = "response")
+testset$predictions <- predict(initialmodel, newdata=testset, type = "response")
 
-#Calculating LogLoss
-logloss <- LogLoss(Made.Donation.in.March.2007, blooddata$predictions)
-hist(logloss)
+
+#Making Submission File
+BloodDonationSubmissionFormat <- read.csv("~/Downloads/BloodDonationSubmissionFormat.csv")
+submission <- data.frame(BloodDonationSubmissionFormat$X)
+colnames(submission)[1] <- 'X'
+submission$Made.Donation.in.March.2007 <- testset$predictions
+
+#Viewing
+View(testset)
+View(submission)
+
+#write submission df to csv
+write.csv(submission, file="submissionfile", quote=FALSE, row.names = FALSE)
+#Simple post-proccessing on file done afterwards on column titles
+
